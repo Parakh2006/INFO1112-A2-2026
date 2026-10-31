@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 assignment_request() {
