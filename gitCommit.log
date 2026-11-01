@@ -1,0 +1,41 @@
+commit 985d708df7a29a96e9cfbb99e75723e8a2283037
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 16:48:30 2026 +1100
+
+    Implement NSW population analysis and nearby POI search
+
+commit 52fd7f2c2e034fd24d13085cb63ff9305b3bdd9d
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 16:11:02 2026 +1100
+
+    Update server and implement NSW population graph
+
+commit 08838b201f343a1e98e818638abb45f2c8fbac02
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 15:30:42 2026 +1100
+
+    Add NSW population extraction from ABS data
+
+commit 23332212f8a8d7680a8250e1bd566b61b42be012
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 09:41:34 2026 +1100
+
+    Implement TCP server and assignment JSON response
+
+commit 3f76ecd2380146b93b11b0162449a3ff5a3cd65f
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 07:18:32 2026 +1100
+
+    Fix request handler and verify assignment response
+
+commit d231f4f2e4486021dc45c0dc75c64d65f3e9fdba
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 07:13:52 2026 +1100
+
+    Implement TCP server and assignment request handler
+
+commit 3a6cd076604c7cc03d9bd84b311db613018142fe
+Author: Parakh Kotwani <pkot0335@uni.sydney.edu.au>
+Date:   Sun Nov 1 06:02:46 2026 +1100
+
+    Set up Alpine environment and basic Netcat server
