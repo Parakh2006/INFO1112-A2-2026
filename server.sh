@@ -140,7 +140,39 @@ EOF
 
     cat /root/assignment.json
 }
+poi_request() {
+    latitude="$1"
+    longitude="$2"
 
+    # Search area approximately 500 metres around the coordinates
+    north=$(awk -v lat="$latitude" 'BEGIN {print lat + 0.0045}')
+    south=$(awk -v lat="$latitude" 'BEGIN {print lat - 0.0045}')
+    east=$(awk -v lon="$longitude" 'BEGIN {print lon + 0.0054}')
+    west=$(awk -v lon="$longitude" 'BEGIN {print lon - 0.0054}')
+
+    viewbox="$west,$north,$east,$south"
+
+    if ! curl -fsS --max-time 20 -G \
+        "https://nominatim.openstreetmap.org/search" \
+        -H "User-Agent: INFO1112-Student-Project/1.0" \
+        --data-urlencode "amenity=cafe" \
+        --data-urlencode "viewbox=$viewbox" \
+        --data-urlencode "bounded=1" \
+        --data-urlencode "format=json" \
+        --data-urlencode "limit=10" \
+        -o /root/pois.json; then
+
+        echo "Error: Unable to retrieve nearby POIs."
+        return 1
+    fi
+
+    if [ ! -s /root/pois.json ]; then
+        echo "Error: No POI data received."
+        return 1
+    fi
+
+    echo "Nearby POIs retrieved successfully."
+}
 show_port &
 
 while true
@@ -162,12 +194,27 @@ do
     if assignment_request >&"${NETCAT[1]}"; then
         generate_assignment_json >&"${NETCAT[1]}"
     fi
-    elif [ "$request" = "population" ]; then
+  elif [ "$request" = "population" ]; then
     if population_request >&"${NETCAT[1]}"; then
         generate_population_graph >&"${NETCAT[1]}"
-    fi 
+    fi
 
    
+elif [[ "$request" == "where am I? "* ]]; then
+    coordinates="${request#where am I? }"
+
+    read -r latitude longitude <<< "$coordinates"
+
+    if [[ "$latitude" =~ ^-?[0-9]+(\.[0-9]+)?$ ]] &&
+       [[ "$longitude" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+
+        if poi_request "$latitude" "$longitude" >&"${NETCAT[1]}"; then
+           python3 -m json.tool /root/pois.json >&"${NETCAT[1]}"
+        fi
+    else
+        echo "Error: Invalid coordinates." >&"${NETCAT[1]}"
+    fi
+
 else
     echo "Error: Unknown request." >&"${NETCAT[1]}"
 fi
