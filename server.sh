@@ -5,7 +5,30 @@ server_port=1234
 
 ip_address=$(ifconfig eth0 | grep "inet " | awk '{print $2}')
 echo "The server is running at Link addr:$ip_address"
+population_request() {
+    url="https://dbr.abs.gov.au/processedData/csv/STE_1.csv"
 
+    if ! curl -fsSL "$url" -o /root/population.csv; then
+        echo "Error: Unable to download population data."
+        return 1
+    fi
+
+    year_column=$(head -n 1 /root/population.csv | tr -d '\r' | tr ',' '\n' | grep -n '^2025$' | cut -d ':' -f 1)
+
+    if [ -z "$year_column" ]; then
+        echo "Error: 2025 population data not found."
+        return 1
+    fi
+
+    population=$(awk -F ',' -v col="$year_column" '$1 == "ERP_P_20" {print $col; exit}' /root/population.csv)
+
+    if [ -z "$population" ]; then
+        echo "Error: NSW population not found."
+        return 1
+    fi
+
+    echo "NSW population in 2025: $population"
+}
 show_port() {
     sleep 1
     listening_port=$(ss -ltn | awk -v p="$server_port" '$1 == "LISTEN" && $4 ~ ":" p "$" {print $4}' | cut -d ':' -f 2)
@@ -86,12 +109,16 @@ do
         fi
 
         if [ "$request" = "assignment" ]; then
-            if assignment_request >&"${NETCAT[1]}"; then
-                generate_assignment_json >&"${NETCAT[1]}"
-            fi
-        else
-            echo "Error: Unknown request." >&"${NETCAT[1]}"
-        fi
+    if assignment_request >&"${NETCAT[1]}"; then
+        generate_assignment_json >&"${NETCAT[1]}"
+    fi
+
+elif [ "$request" = "population" ]; then
+    population_request >&"${NETCAT[1]}"
+
+else
+    echo "Error: Unknown request." >&"${NETCAT[1]}"
+fi
     fi
 
     kill "$NETCAT_PID" 2>/dev/null
